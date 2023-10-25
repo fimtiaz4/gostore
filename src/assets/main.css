@@ -1,0 +1,13 @@
+@import "./css/all.css";
+@import "./css/bootstrap.min.css";
+@import "./css/owl.carousel.min.css";
+@import "./css/owl.theme.default.min.css";
+@import "./css/global.css";
+@import "./css/bootstrap-extenstions.css";
+@import "./css/style.css";
+
+.products-item img {
+  height: 220px !important;
+  width: 100%;
+  object-fit: contain !important;
+}
