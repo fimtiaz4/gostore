@@ -1,6 +1,23 @@
 <script setup>
 import Header from "../components/Header.vue";
 import productItems from "../components/product-items.vue";
+import { filters } from "../store/filter";
+import { sortKeyLTH, sortKeyHTL, productsUrl, baseUrl } from "../store/data";
+// const products = filter.products.value;
+import { ref, watch } from "vue";
+const selectedSortKey = ref("default");
+
+watch(selectedSortKey, (newVal) => {
+  if (newVal === "price_low_to_high") {
+    sortKeyLTH();
+  }
+  if (newVal === "price_high_to_low") {
+    sortKeyHTL();
+  }
+  if (newVal === "default") {
+    productsUrl.value = baseUrl;
+  }
+});
 </script>
 
 <template>
@@ -33,10 +50,10 @@ import productItems from "../components/product-items.vue";
                     <div class="accordion cursor-p" id="accordionPanelsStayOpenExample">
                       <!--====== Accordion-Item collapse button ======-->
                       <label for="customRange1" class="form-label text-uppercase fw-bold mt-1 mb-1">Sort by</label>
-                      <select class="form-select box-shadow-none rounded-0 border-0 bg-light" aria-label="Default select example">
-                        <option selected="">Sort by name</option>
-                        <option value="1">sort by price: low to high</option>
-                        <option value="2">sort by price: high to low</option>
+                      <select v-model="selectedSortKey" class="form-select box-shadow-none rounded-0 border-0 bg-light" aria-label="Default select example">
+                        <option :value="'default'">Default</option>
+                        <option :value="'price_low_to_high'">Sort by price: Low to High</option>
+                        <option :value="'price_high_to_low'">Sort by price: High to Low</option>
                       </select>
                     </div>
                   </div>
@@ -53,7 +70,7 @@ import productItems from "../components/product-items.vue";
                   <!--== section price ==-->
                   <div class="col-12 mb-5 pe-4">
                     <label for="customRange1" class="form-label text-uppercase fw-bold mt-1 mb-1">price</label>
-                    <input type="range" class="form-range" id="customRange1" />
+                    <input type="range" min="0" max="100" step="1" class="form-range" id="customRange1" />
                   </div>
                 </div>
               </div>

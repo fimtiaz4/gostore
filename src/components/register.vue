@@ -1,4 +1,3 @@
-//create home component
 <script setup>
 import { ref } from "vue";
 import { authStore } from "../store/store";

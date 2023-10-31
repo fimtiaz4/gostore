@@ -1,16 +1,31 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 // import axios from "axios";
 import "../assets/js/bootstrap.bundle.js";
 import "../assets/js/jquery-3.6.0.min.js";
 import "../assets/js/jquery.zoom.min.js";
 import "../assets/js/owl.carousel.min.js";
 import "../assets/js/poper.min.js";
-import { filter } from "../store/filter";
+import { filters } from "../store/filter";
 import { cart } from "../store/cart";
 import { authStore } from "../store/store";
 const auth = authStore;
 // const filter = ref("sss");
+import { productsUrl, removeParametersFromURL } from "../store/data";
+
+const name = ref("");
+productsUrl.value = `${productsUrl.value}${productsUrl.value.includes("?") ? "&" : "?"}name=${name.value}`;
+
+// Function to update 'productsUrl' with 'name' and 'page' parameters
+function updateProductsUrl(newName) {
+  // const baseUrl = "http://ecom.coderstream.com/api/products/search";
+  // const updatedURL = `${baseUrl}?name=${newName}`;
+  const currentURL = productsUrl.value;
+  productsUrl.value = `${removeParametersFromURL(currentURL, ["name", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}name=${newName}`;
+}
+
+// Watch for changes in 'name' and call the update function
+watch(name, updateProductsUrl);
 </script>
 
 <template>
@@ -37,7 +52,8 @@ const auth = authStore;
               <div class="col col-xl-8 px-0 search-prod">
                 <form action="" class="row g-0 border" id="category-search-box">
                   <div class="col input-group">
-                    <input type="text" v-model="filter" class="form-control rounded-0 border-0 placeholder-sm" placeholder="Search for Product" />
+                    <input type="text" v-model="name" class="form-control rounded-0 border-0 placeholder-sm" placeholder="Search for Product" />
+                    <!-- <input type="text" v-model="filter" class="form-control rounded-0 border-0 placeholder-sm" placeholder="Search for Product" /> -->
                     <button class="input-group-text border-0 rounded-0 bg-white"><i class="fa fa-search"></i></button>
                   </div>
                 </form>

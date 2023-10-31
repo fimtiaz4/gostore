@@ -1,42 +1,65 @@
-import { reactive, ref, watchEffect, computed } from "vue";
+import { reactive, ref, watchEffect, computed, watch } from "vue";
 import axios from "axios";
-import { filter } from "./filter";
 
-// const filter = ref(filters);
-// import { filter } from "../store/filter";
-// console.log(filter);
-// const productArr = reactive({
-//   dat(page) {
-//     const allprod = ref([]);
-//     const products = ref([]);
+const productsUrl = ref("http://ecom.coderstream.com/api/products/search");
+const baseUrl = "http://ecom.coderstream.com/api/products/search";
+const products = ref([]);
 
-//     const fetchData = () => {
-//       axios.get(`http://ecom.coderstream.com/api/products/search?sort_key=price_low_to_high&name=${filter.value}&min=1&max=10000&page=${page.value}`).then((res) => {
-//         products.value = res.data;
-//         products.value.data.forEach((element) => {
-//           allprod.value.push(element);
-//         });
-//       });
-//     };
-//     watchEffect(() => {
-//       fetchData();
-//     });
-//     return { allprod, products };
-//   },
-// });
-// export { productArr };
-const productArr = reactive({
-  dat() {
-    const products = ref([]);
-    const fetchData = () => {
-      axios.get(`http://ecom.coderstream.com/api/products/search?name=${filter.value}`).then((res) => {
-        products.value = res.data;
-      });
-    };
-    watchEffect(() => {
-      fetchData();
-    });
-    return { products };
-  },
+const fetchData = (url) => {
+  axios.get(url).then((res) => {
+    products.value = res.data;
+  });
+};
+
+fetchData(productsUrl.value); // Initial fetch
+
+watchEffect(() => {
+  fetchData(productsUrl.value); // Fetch when productsUrl changes
 });
-export { productArr };
+
+function removeParametersFromURL(url, paramsToRemove) {
+  const parsedURL = new URL(url);
+  const searchParams = new URLSearchParams(parsedURL.search);
+
+  paramsToRemove.forEach((param) => {
+    if (searchParams.has(param)) {
+      searchParams.delete(param);
+    }
+  });
+
+  return `${parsedURL.origin}${parsedURL.pathname}?${searchParams.toString()}`;
+}
+
+const sortKeyLTH = (pageNum = 1) => {
+  const currentURL = productsUrl.value;
+  // const updatedURL = `${baseUrl}${currentURL.includes("?") ? "?" : "?"}sort_key=price_low_to_high&page=${pageNum}`;
+  const updatedURL = `${removeParametersFromURL(currentURL, ["sort_key", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}sort_key=price_low_to_high&page=${pageNum}`;
+  productsUrl.value = updatedURL;
+};
+const sortKeyHTL = (pageNum = 1) => {
+  const currentURL = productsUrl.value;
+  const updatedURL = `${removeParametersFromURL(currentURL, ["sort_key", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}sort_key=price_high_to_low&page=${pageNum}`;
+  productsUrl.value = updatedURL;
+};
+// for select box
+const sortKey = (pageNum = 1) => {
+  const currentURL = productsUrl.value;
+  const updatedURL = `${removeParametersFromURL(currentURL, ["sort_key", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}page=${pageNum}`;
+  productsUrl.value = updatedURL;
+  if (currentURL.includes("sort_key=price_low_to_high")) {
+    const updatedURL = `${removeParametersFromURL(currentURL, ["sort_key", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}sort_key=price_low_to_high&page=${pageNum}`;
+    productsUrl.value = updatedURL;
+  }
+  if (currentURL.includes("sort_key=price_high_to_low")) {
+    const updatedURL = `${removeParametersFromURL(currentURL, ["sort_key", "page"])}${productsUrl.value.includes("?") ? "&" : "?"}sort_key=price_high_to_low&page=${pageNum}`;
+    productsUrl.value = updatedURL;
+  }
+};
+// for adding name parameter to url
+// const namePara = (pageNum = 1) => {
+//   const currentURL = productsUrl.value;
+//   const updatedURL = `${removeParametersFromURL(currentURL, ["name"])}&page=${pageNum}`;
+//   productsUrl.value = updatedURL;
+// };
+
+export { products, sortKeyLTH, productsUrl, sortKeyHTL, sortKey, baseUrl, removeParametersFromURL };
