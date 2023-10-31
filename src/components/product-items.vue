@@ -21,11 +21,9 @@ const sortKeyPage = () => {
     sortKeyHTL();
   }
 };
-console.log(products);
 </script>
 
 <template>
-  {{ productsUrl }}
   <div class="col-12 col-lg-9 px-3" id="products">
     <div class="row justify-content-center gap-2 gap-sm-0 pb-4">
       <div v-for="product in products.data" :key="product.id" class="col-8 col-sm-4 col-md-3 p-0 products-item">

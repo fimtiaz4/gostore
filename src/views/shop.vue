@@ -1,12 +1,20 @@
 <script setup>
+import { ref, watch, reactive } from "vue";
 import Header from "../components/Header.vue";
 import productItems from "../components/product-items.vue";
 import { filters } from "../store/filter";
-import { sortKeyLTH, sortKeyHTL, productsUrl, baseUrl } from "../store/data";
-// const products = filter.products.value;
-import { ref, watch } from "vue";
-const selectedSortKey = ref("default");
+import { sortKeyLTH, sortKeyHTL, productsUrl, baseUrl, removeParametersFromURL } from "../store/data";
+import Slider from "primevue/slider";
+const rangeS = 0;
+const rangeD = 1000;
+const rangeValues = ref([rangeS, rangeD]);
+const currentURL = productsUrl.value;
+watch(rangeValues, (newRangeValues) => {
+  const updatedURL = `${removeParametersFromURL(currentURL, ["page"])}${productsUrl.value.includes("?") ? "&" : "?"}min=${rangeValues.value[0]}${productsUrl.value.includes("?") ? "&" : "?"}max=${rangeValues.value[1]}`;
+  productsUrl.value = updatedURL;
+});
 
+const selectedSortKey = ref("default");
 watch(selectedSortKey, (newVal) => {
   if (newVal === "price_low_to_high") {
     sortKeyLTH();
@@ -70,13 +78,16 @@ watch(selectedSortKey, (newVal) => {
                   <!--== section price ==-->
                   <div class="col-12 mb-5 pe-4">
                     <label for="customRange1" class="form-label text-uppercase fw-bold mt-1 mb-1">price</label>
-                    <input type="range" min="0" max="100" step="1" class="form-range" id="customRange1" />
+
+                    <Slider v-model="rangeValues" range :min="rangeS" :max="rangeD" :step="1" />
+                    <div class="d-flex justify-content-between input-range mt-4"><input :min="rangeS" type="number" v-model="rangeValues[0]" /> <input type="number" :max="rangeD" v-model="rangeValues[1]" /></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <!--===== Product-Items-area =====-->
+
           <productItems />
         </div>
       </div>
@@ -85,6 +96,15 @@ watch(selectedSortKey, (newVal) => {
 </template>
 
 <style scoped>
+.input-range input {
+  width: 60px;
+  justify-content: space-between;
+  display: flex;
+}
+.p-slider .p-slider-handle {
+  background: red !important;
+  border: 2px solid red !important;
+}
 .accordion-toggle-open {
   display: none;
 }
